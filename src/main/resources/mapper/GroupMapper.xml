@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.daling.party.repository.dao.GroupDao" >
+
+  <resultMap id="BaseResultMap" type="com.daling.party.domain.entity.Group">
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="group_code" property="groupCode" jdbcType="VARCHAR"/>
+    <result column="head_id" property="headId" jdbcType="BIGINT"/>
+    <result column="spu" property="spu" jdbcType="VARCHAR"/>
+    <result column="activity_code" property="activityCode" jdbcType="VARCHAR"/>
+    <result column="group_type" property="groupType" jdbcType="INTEGER"/>
+    <result column="group_rule" property="groupRule" jdbcType="VARCHAR"/>
+    <result column="upper_limit" property="upperLimit" jdbcType="INTEGER"/>
+    <result column="lower_limit" property="lowerLimit" jdbcType="INTEGER"/>
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+    <result column="status" property="status" jdbcType="TINYINT"/>
+    <result column="join_num" property="joinNum" jdbcType="INTEGER"/>
+    <result column="surplus_num" property="surplusNum" jdbcType="INTEGER"/>
+    <result column="remaining_msg_push_status" property="remainingMsgPushStatus" jdbcType="INTEGER"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+
+    <result column="validity" property="validity" jdbcType="INTEGER"/>
+    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+  </resultMap>
+
+  <resultMap id="groupBoResultMap" type="com.daling.party.service.group.bo.GroupMsgBo">
+    <id column="groupCode" property="groupCode"/>
+    <result column="status" property="status"/>
+    <result column="groupType" property="groupType"/>
+    <result column="upperLimit" property="upperLimit"/>
+    <result column="lowerLimit" property="lowerLimit"/>
+    <result column="surplusNum" property="surplusNum"/>
+    <result column="joinNum" property="joinNum"/>
+    <result column="startTime" property="startTime"/>
+    <result column="endTime" property="endTime"/>
+    <result column="headUserId" property="headUserId"/>
+    <result column="headImg" property="headImg"/>
+    <result column="headNickname" property="headNickname"/>
+    <result column="createTime" property="createTime"/>
+    <result column="validity" property="validity"/>
+    <result column="shopId" property="shopId"/>
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, group_code, head_id, spu, activity_code, group_type, upper_limit, lower_limit, start_time, end_time, status, join_num, surplus_num, remaining_msg_push_status, group_rule, create_time, update_time,validity,shop_id
+  </sql>
+  <sql id="Group_Msg">
+    g.group_code AS groupCode,
+    g.status AS status,
+    g.group_type AS groupType,
+    g.group_rule AS groupRule,
+    g.lower_limit AS lowerLimit,
+    g.head_id AS headUserId,
+    g.upper_limit AS upperLimit,
+    g.lower_limit AS lowerLimit,
+    g.surplus_num AS surplusNum,
+    g.join_num AS joinNum,
+    g.start_time AS startTime,
+    g.end_time AS endTime,
+    g.create_time AS createTime,
+    g.validity AS validity,
+    g.shop_id AS shopId
+  </sql>
+
+  <select id="groupListByActivityCode" resultMap="groupBoResultMap" parameterType="map">
+    SELECT
+      <include refid="Group_Msg"></include>,
+      gm.user_img AS headImg,
+      gm.username AS headNickname
+    FROM s_group g, s_group_member gm
+    WHERE g.head_id = gm.user_id AND g.id = gm.group_id AND gm.is_join = 1 AND g.activity_code = #{activityCode}
+     AND gm.group_role = 1 AND g.start_time &lt; now() AND g.end_time &gt; now() AND g.status IN (1, 3)
+      <if test="spu != null">
+        AND g.spu = #{spu}
+      </if>
+      <if test="shopId != null">
+        AND g.shop_id = #{shopId}
+      </if>
+    ORDER BY g.status DESC,g.group_type DESC,  g.start_time ASC, g.surplus_num DESC
+    LIMIT #{pageVO.start}, #{pageVO.pageSize}
+  </select>
+
+  <select id="userGroupList" resultType="com.daling.party.service.group.bo.UserGroupBo" parameterType="map">
+    SELECT
+    <include refid="Group_Msg"></include>,
+      gm.sku AS productSku,
+      gm.product_name AS productName,
+      gm.product_img AS productImg,
+      gm.positive_price AS productPositivePerice,
+      gm.sale_price AS productSalePerice,
+      gm.total_money AS productTotalMoney,
+      gm.order_status AS orderStatus,
+      gm.join_type AS joinType,
+      gm.group_role AS groupRole,
+      gm.create_time AS joinTime
+    FROM s_group g, s_group_member gm
+    WHERE g.id = gm.group_id AND gm.user_id = #{userId} AND gm.is_join = 1
+      <choose>
+        <when test="type == 0"> <!-- 全部 -->
+          AND g.status != 0
+        </when>
+        <when test="type == 1"> <!-- 成功 -->
+          AND g.status = #{type}
+        </when>
+        <when test="type == 2"> <!-- 失败(失败的状态为定时任务更新，不实时，增加判断) -->
+          AND ((g.status = #{type}) OR (g.status = 3 AND g.end_time &lt; #{now} AND g.surplus_num != 0))
+        </when>
+        <when test="type == 3"> <!-- 进行中(失败的状态为定时任务更新，不实时，增加判断) -->
+          AND g.status = #{type} AND g.end_time &gt;= #{now} AND g.surplus_num != 0
+        </when>
+      </choose>
+    ORDER BY gm.id DESC
+    LIMIT #{pageVO.start}, #{pageVO.pageSize}
+  </select>
+
+  <select id="selectCurrentUserGroupEndTimeList" resultType="java.lang.Long">
+    SELECT
+        unix_timestamp(sg.end_time)
+    FROM
+        s_group sg
+        INNER JOIN s_group_member sgm ON sg.id = sgm.group_id
+    WHERE
+        sg.status = #{status} and sgm.is_join=1
+        AND end_time > now( ) and sgm.user_id=#{userId}
+  </select>
+
+
+  <select id="loadGroupMessage" resultMap="groupBoResultMap" parameterType="map">
+    SELECT
+    <include refid="Group_Msg"></include>,
+      gm.user_img AS headImg,
+      gm.username AS headNickname
+    FROM s_group g, s_group_member gm
+    WHERE g.head_id = gm.user_id AND g.id = gm.group_id
+      AND g.group_code = #{groupCode} AND g.status != 0
+    LIMIT 0, 1
+  </select>
+
+  <select id="queryUniqShareGroup" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM s_group
+    WHERE activity_code = #{activityCode} AND head_id = #{userId} AND spu = #{spu} AND group_type = #{groupType} AND status = #{groupStatus} AND end_time <![CDATA[>]]> NOW()
+  </select>
+
+  <select id="queryGroupByCode" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM s_group
+    WHERE group_code = #{groupCode}
+  </select>
+
+  <select id="batchQueryGroup" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM t_recommendation_info WHERE group_code IN
+    <foreach collection="groupCodes" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+    <select id="selectGroupEndTimeStatus" resultMap="BaseResultMap">
+    select * from s_group where end_time <![CDATA[<=]]> ( DATE_SUB( NOW( ), INTERVAL 1 MINUTE ) ) and status in(3,0)
+  </select>
+
+    <update id="batchUpdateGroupEndTimeStatus" >
+        update s_group set `status`= #{status},update_time = NOW( ) where id in
+        <foreach item="id" index="index" collection="ids"
+                 open="(" separator="," close=")">
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+  <insert id="insertGroupSelectKey" parameterType="com.daling.party.domain.entity.Group">
+    <selectKey keyProperty="id" resultType="long" order="AFTER">
+      select @@IDENTITY as id
+    </selectKey>
+    INSERT INTO s_group
+    (
+    group_code, head_id, spu, activity_code, group_type, group_rule, upper_limit, lower_limit,
+    start_time, end_time, status, join_num, surplus_num, remaining_msg_push_status, create_time, update_time,validity,shop_id
+    )
+    values
+    (
+    #{groupCode}, #{headId}, #{spu}, #{activityCode}, #{groupType}, #{groupRule},
+    #{upperLimit}, #{lowerLimit}, #{startTime}, #{endTime}, #{status}, #{joinNum},
+    #{surplusNum}, #{remainingMsgPushStatus}, #{createTime}, #{updateTime},#{validity},#{shopId}
+    )
+  </insert>
+</mapper>

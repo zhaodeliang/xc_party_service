@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmonitor-configuration>
+	<!--是否启用Push数据, 是否必填项:否, 默认值:true -->
+	<enabled>true</enabled>
+	<!--集群分组名称, 是否必填项:是 -->	
+	<group-name>xc_party_betap</group-name>
+	<!--每个站点数据是否单独监控, 是否必填项:是 , 默认值:false-->
+	<record-single-site>true</record-single-site>
+	<!-- 监控Key统一添加前缀, 以便于分类过滤, 如果已经使用了DMonitorAgent类的, 不要使用该前缀, 是否必填项:否, 默认值:空字符串
+	<record-key-prefix>xc_sale_</record-key-prefix>
+	-->	
+	<!-- 是否监控周期内最大值, 是否必填项:否, 默认值:false -->	
+	<record-max-count>true</record-max-count>
+	<!--websocket连接URL, 是否必填项:是 -->
+	<websocket-url>ws://l-qa11.beta.daling.com:8085/dmonitor_server/dmoniws</websocket-url>
+	<!--数据自动支持dump周期S10和S60-->
+	<!-- push上传数据周期, 只允许0(不允许任何周期), 1(当前不支持), 10(10秒周期),60(60秒周期), 是否必填项:是-->
+	<push-interval>10</push-interval>
+</dmonitor-configuration>

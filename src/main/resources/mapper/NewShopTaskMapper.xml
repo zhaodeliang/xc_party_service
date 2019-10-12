@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.daling.party.repository.dao.NewShopTaskDao">
+
+    <resultMap id="BaseResultMap" type="com.daling.party.domain.entity.NewShopTask">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="shop_id" property="shopId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="welfare_id" property="welfareId" jdbcType="BIGINT"/>
+        <result column="task_code" property="taskCode" jdbcType="VARCHAR"/>
+        <result column="task_desc_up" property="taskDescUp" jdbcType="VARCHAR"/>
+        <result column="task_desc_down" property="taskDescDown" jdbcType="VARCHAR"/>
+        <result column="task_url" property="taskUrl" jdbcType="VARCHAR"/>
+        <result column="medal_num" property="medalNum" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="finished_time" property="finishedTime" jdbcType="TIMESTAMP"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+          id, shop_id, user_id, welfare_id, task_code, task_desc_up, task_desc_down,
+          task_url, medal_num, status, finished_time, create_date, modify_date
+    </sql>
+    <sql id="column_msg">
+          a.id, a.shop_id, a.user_id, a.welfare_id, a.task_code, a.task_desc_up, a.task_desc_down,
+          a.task_url, a.medal_num, a.status, a.finished_time, a.create_date, a.modify_date
+    </sql>
+    <insert id="insertTask" parameterType="com.daling.party.domain.entity.NewShopTask">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            select @@IDENTITY as id
+        </selectKey>
+        INSERT INTO t_new_shop_task_snapshot
+        (
+        shop_id, user_id, welfare_id, task_code,status, create_date, modify_date
+        )
+        values
+        (
+        #{shopId}, #{userId}, #{welfareId}, #{taskCode}, #{status}, #{createDate},#{modifyDate}
+        )
+    </insert>
+
+    <select id="queryNewShopTask" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="column_msg"></include>
+        FROM t_new_shop_task_snapshot a
+        <where>
+            <if test="shopId != null">
+                AND a.shop_id = #{shopId}
+            </if>
+        </where>
+        ORDER BY a.finished_time ASC
+    </select>
+    <update id="updateTask" parameterType="com.daling.party.domain.entity.NewShopTask">
+        update t_new_shop_task_snapshot
+        <set>
+            <if test="null != taskDescUp and taskDescUp != ''">
+                task_desc_up = #{taskDescUp},
+            </if>
+            <if test="null != taskDescDown and taskDescDown != ''">
+                task_desc_down = #{taskDescDown},
+            </if>
+            <if test="null != taskUrl and taskUrl != ''">
+                task_url = #{taskUrl},
+            </if>
+            <if test="null != medalNum and medalNum != 0">
+                medal_num = #{medalNum},
+            </if>
+            <if test="null != status and status != 0">
+                status = #{status},
+            </if>
+            <if test="finishedTime != null">
+                finished_time = #{finishedTime},
+            </if>
+            <if test="modifyDate != null">
+                modify_date = #{modifyDate},
+            </if>
+        </set>
+        <where>
+            <if test="id != null and id != 0">
+                and id = #{id}
+            </if>
+            <if test="shopId != null and shopId != 0">
+                and shop_id = #{shopId}
+            </if>
+            <if test="taskCode != null and taskCode !=''">
+                and task_code = #{taskCode}
+            </if>
+        </where>
+    </update>
+
+</mapper>

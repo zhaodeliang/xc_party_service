@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.daling.party.repository.dao.GroupMemberDao">
+
+    <resultMap id="BaseResultMap" type="com.daling.party.domain.entity.GroupMember">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="user_img" property="userImg" jdbcType="VARCHAR"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="group_id" property="groupId" jdbcType="BIGINT"/>
+        <result column="sku" property="sku" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="product_img" property="productImg" jdbcType="VARCHAR"/>
+        <result column="positive_price" property="positivePrice" jdbcType="DECIMAL"/>
+        <result column="sale_price" property="salePrice" jdbcType="DECIMAL"/>
+        <result column="total_money" property="totalMoney" jdbcType="DECIMAL"/>
+        <result column="order_status" property="orderStatus" jdbcType="INTEGER"/>
+        <result column="join_type" property="joinType" jdbcType="INTEGER"/>
+        <result column="group_role" property="groupRole" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="buy_num" property="buyNum" jdbcType="INTEGER"/>
+        <result column="is_new" property="isNew" jdbcType="INTEGER"/>
+        <result column="valid_flag" property="validFlag" jdbcType="INTEGER"/>
+        <result column="remind_mes_flag" property="remindMesFlag" jdbcType="INTEGER"/>
+        <result column="is_join" property="isJoin" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+    id, user_id, user_img, username, group_id, sku, product_name, product_img, positive_price,
+    sale_price, total_money, order_status, join_type, group_role, order_no, buy_num, is_new, valid_flag, remind_mes_flag, is_join, create_time, update_time
+  </sql>
+
+    <select id="queryGroupMemberList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM s_group_member
+        WHERE group_id = #{groupId} AND is_join = #{isJoin}
+    </select>
+
+    <select id="selectValidGroupMember" resultType="com.daling.party.service.group.bo.ExtGroupMember" parameterType="map">
+        SELECT
+        sgm.id as id,sgm.order_no as orderNo,sg.status as groupStatus,sgm.group_id as groupId,sg.group_code as groupCode,sgm.user_id as userId,
+        sgm.group_role as groupRole,sg.end_time as endTime,sg.surplus_num as surplusNum
+        FROM
+        s_group_member sgm
+        INNER JOIN s_group sg ON sgm.group_id = sg.id
+        WHERE
+        sg.end_time <![CDATA[<=]]> ( DATE_SUB( NOW( ), INTERVAL 1 MINUTE ) )
+        AND sgm.valid_flag = #{validFlag}
+        LIMIT #{pageVO.start}, #{pageVO.pageSize}
+    </select>
+
+    <update id="updateGroupMemberValidFlag" >
+        update s_group_member set valid_flag = #{validFlag} where id = #{id}
+    </update>
+
+
+    <update id="updateOrderStatus">
+        update s_group_member set order_status = #{orderStatus}, valid_flag = #{validFlag}  where user_id in
+        <foreach collection="userIds" item="item" index="index" open="(" separator="," close=")" >
+            #{item}
+        </foreach>
+        AND group_id = #{groupId}
+    </update>
+
+    <select id="queryMember" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM s_group_member
+        WHERE group_id = #{groupId} AND order_no = #{orderNo}
+    </select>
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lock2s-configuration version="2.0.0">
+    <lock-name-prefix>xcparty</lock-name-prefix>
+    <rlock-config>
+            <server>
+                <host>a-redis1.dev.bj4.daling.com</host>
+                <port>6379</port>
+            </server>
+        <command-timeout>1000</command-timeout>
+        <lock-auto-timeout>60000</lock-auto-timeout>
+    </rlock-config>
+    <zlock-config>
+        <servers>
+            <server>
+                <host>a-zk1.dev.bj4.daling.com</host>
+                <port>2181</port>
+            </server>
+            <server>
+                <host>a-zk1.dev.bj4.daling.com</host>
+                <port>2182</port>
+            </server>
+            <server>
+                <host>a-zk1.dev.bj4.daling.com</host>
+                <port>2183</port>
+            </server>
+        </servers>
+    </zlock-config>
+</lock2s-configuration>

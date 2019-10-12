@@ -1,0 +1,62 @@
+server:
+  port: 8081
+  undertow:
+    io-threads: 12
+    worker-threads: 60
+  servlet.context-path : /xc_party
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  config-location: classpath:mybatis-config.xml
+  type-aliases-package: com.daling.party.domain.entity
+logging:
+  level:
+    com.daling.account.coin.mapper: debug
+
+
+spring:
+  datasource:
+      url: jdbc:mysql://proxysql.srv.daling.com:6033/xc_growth?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+      username: xc_growth_rw
+      password: gefram-Zecni3-pykcat
+      driverClassName: com.mysql.jdbc.Driver
+      initialSize: 30
+      minIdle: 20
+      maxActive: 100
+      maxWait: 3000
+      minEvictableIdleTimeMillis: 30000
+      type: com.alibaba.druid.pool.DruidDataSource
+  rabbitmq:
+    host: rabbitmq.srv.daling.com
+    port: 5672
+    username: erp
+    password: daling.com
+    publisher-confirms: true
+    virtual-host: /erp
+
+xcucenter:
+  host: http://xc.srv.daling.com
+
+xcsale:
+  host: http://xc.srv.daling.com
+
+dalcec:
+  host: http://cec.srv.daling.com
+
+goodcenter:
+  host: http://goods.srv.daling.com
+
+activity:
+  host: http://xc.srv.daling.com
+
+coupon:
+  host: http://xc.srv.daling.com
+
+price:
+  host: http://xc.srv.daling.com
+
+redis:
+  cluster:
+      host: 10.0.32.23:6381,10.0.32.27:6383,10.0.32.29:6384,10.0.32.20:6380,10.0.32.31:6385,10.0.32.25:6382
+
+
+dal_operation_log_query_url: http://l-erptools1.erp.bj2.daling.com:8083

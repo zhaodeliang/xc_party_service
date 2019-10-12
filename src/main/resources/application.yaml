@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: @activatedProfile@
+logging:
+  config: classpath:logback.xml
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 2000
+        readTimeout: 2000
+server:
+  compression:
+    enabled: true
+    min-response-size: 1024
+party:
+  uncheck:
+    url:
+      prefix: group/unCheck,inner,group/task,group/groupListGoodsDetail.do
+mapper:
+  mappers: com.daling.party.infrastructure.base.BaseDao

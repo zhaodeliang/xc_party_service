@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.daling.party.repository.dao.NewShopWelfareDao">
+
+    <resultMap id="BaseResultMap" type="com.daling.party.domain.entity.NewShopWelfare">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="shop_id" property="shopId" jdbcType="BIGINT"/>
+        <result column="shop_time" property="shopTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="welfare_status" property="welfareStatus" jdbcType="TINYINT"/>
+        <result column="medal_num" property="medalNum" jdbcType="INTEGER"/>
+        <result column="prize_one" property="prizeOne" jdbcType="TINYINT"/>
+        <result column="prize_two" property="prizeTwo" jdbcType="TINYINT"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+          id, shop_id, user_id, status, medal_num, prize_one, prize_two,create_date, modify_date
+    </sql>
+    <sql id="column_msg">
+          a.id, a.shop_id, a.user_id, a.status, a.medal_num, a.prize_one, a.prize_two,
+          a.create_date, a.modify_date
+    </sql>
+    <insert id="initWelfare" parameterType="com.daling.party.domain.entity.NewShopWelfare">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            select @@IDENTITY as id
+        </selectKey>
+        INSERT INTO t_new_shop_welfare
+        (
+        user_id, shop_id, shop_time, status,welfare_status, medal_num, prize_one,
+        prize_two, create_date, modify_date
+        )
+        values
+        (
+        #{userId}, #{shopId}, #{shopTime}, #{status}, #{welfareStatus}, #{medalNum},#{prizeOne},
+        #{prizeTwo}, #{createDate}, #{modifyDate}
+        )
+    </insert>
+
+    <select id="getWelfare" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="column_msg"></include>
+        FROM t_new_shop_welfare a
+        WHERE a.shopId = #{shopId}
+        ORDER BY a.finished_time ASC
+    </select>
+
+    <update id="updateWelfare" parameterType="com.daling.party.domain.entity.NewShopWelfare">
+        update t_new_shop_welfare
+        <set>
+            <if test="status != 0">
+                status = #{status},
+            </if>
+            <if test="welfareStatus != null and welfareStatus != 0">
+                welfare_status = #{welfareStatus},
+            </if>
+            <if test="prizeOne != null and prizeOne != 0">
+                prize_one = #{prizeOne},
+            </if>
+            <if test="prizeTwo != null and prizeTwo != 0">
+                prize_two = #{prizeTwo},
+            </if>
+            <if test="modifyDate != null">
+                modify_date = #{modifyDate},
+            </if>
+        </set>
+        <where>
+            <if test="id != null and id != 0">
+                and id = #{id}
+            </if>
+            <if test="shopId != null and shopId != 0">
+                and shop_id = #{shopId}
+            </if>
+        </where>
+    </update>
+
+</mapper>

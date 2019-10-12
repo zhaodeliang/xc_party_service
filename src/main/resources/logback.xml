@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <property name="LOG_HOME" value="./logs"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="com.daling.party.infrastructure.logback.LogBackExEncoder">
+            <!--<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}#%method:%line - %msg%n</pattern>-->
+            <pattern>%d|%X{removeIP}|[%X{sessionTokenId}]|%-5level|%logger{65}|%msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/xc_party_info.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--&lt;!&ndash;过滤 Error&ndash;&gt;-->
+            <!--<level>ERROR</level>-->
+            <!--&lt;!&ndash;匹配到就禁止&ndash;&gt;-->
+            <!--<onMatch>DENY</onMatch>-->
+            <!--&lt;!&ndash;没有匹配到就允许&ndash;&gt;-->
+            <!--<onMismatch>ACCEPT</onMismatch>-->
+        </filter>
+
+        <encoder class="com.daling.party.infrastructure.logback.LogBackExEncoder">
+            <pattern>%d|%X{removeIP}|[%X{sessionTokenId}]|%-5level|%logger{65}|%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/xc_party_error.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--设置日志级别,过滤掉info日志,只输入error日志-->
+            <level>ERROR</level>
+        </filter>
+
+        <encoder class="com.daling.party.infrastructure.logback.LogBackExEncoder">
+            <pattern>%d|%X{removeIP}|[%X{sessionTokenId}]|%-5level|%logger{65}|%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--myibatis log configure-->
+    <logger name="com.apache.ibatis" level="INFO"/>
+    <logger name="java.sql.Connection" level="INFO"/>
+    <logger name="java.sql.Statement" level="INFO"/>
+    <logger name="java.sql.PreparedStatement" level="INFO"/>
+    <logger name="com.daling.party.repository.dao" level="INFO"/>
+
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>4096</discardingThreshold>
+        <queueSize>5120</queueSize>
+        <appender-ref ref="FILE"/>
+    </appender>
+
+
+    <!-- 日志输出级别 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ASYNC"/>
+        <appender-ref ref="ERROR"/>
+    </root>
+</configuration>

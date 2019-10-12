@@ -1,0 +1,59 @@
+server:
+  port: 8081
+  undertow:
+    io-threads: 12
+    worker-threads: 60
+  servlet.context-path : /xc_party
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  config-location: classpath:mybatis-config.xml
+  type-aliases-package: com.daling.party.domain.entity
+logging:
+  level:
+    com.daling.account.coin.mapper: debug
+
+
+spring:
+  datasource:
+      url: jdbc:mysql://b-db1.qa.bj4.daling.com:3306/xc_growth_db?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+      username: daling_app_rw
+      password: 1234@Daling
+      driverClassName: com.mysql.jdbc.Driver
+      initialSize: 30
+      minIdle: 20
+      maxActive: 100
+      maxWait: 3000
+      minEvictableIdleTimeMillis: 30000
+      type: com.alibaba.druid.pool.DruidDataSource
+  rabbitmq:
+    host: s-rabbitmq1.qa.bj4.daling.com
+    port: 5672
+    username: daling
+    password: daling
+    publisher-confirms: true
+    virtual-host: /erp_betab
+
+xcucenter:
+  host: http://b.xc.qa.daling.com
+
+xcsale:
+  host: http://b.xc.qa.daling.com
+
+dalcec:
+  host: http://b.cec.qa.daling.com
+
+goodcenter:
+  host: http://b.goods.qa.daling.com
+
+activity:
+  host: http://b.xc.qa.daling.com
+
+coupon:
+  host: http://b.xc.qa.daling.com
+
+price:
+  host: http://b.xc.qa.daling.com
+
+redis:
+  cluster:
+    host: b-redis1.qa.bj4.daling.com:6380,b-redis1.qa.bj4.daling.com:6381,b-redis1.qa.bj4.daling.com:6382,b-redis1.qa.bj4.daling.com:6383,b-redis1.qa.bj4.daling.com:6384,b-redis1.qa.bj4.daling.com:6385

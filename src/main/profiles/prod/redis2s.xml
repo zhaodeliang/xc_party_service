@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Redis Configuration BETAA -->
+<redis2s-configuration>
+	<default-connection-pool>default</default-connection-pool>
+	<!--没用-->
+	<connection-pool name="default">
+		<pool-type>SINGLE</pool-type>
+		<server>
+			<host>127.0.0.1</host>
+			<port>19001</port>
+		</server>
+		<max-active>8192</max-active>
+		<min-idle>10</min-idle>
+		<max-idle>50</max-idle>
+		<max-wait>5000</max-wait>
+		<timeout>5000</timeout>
+		<test-on-borrow>true</test-on-borrow>
+	</connection-pool>
+</redis2s-configuration>

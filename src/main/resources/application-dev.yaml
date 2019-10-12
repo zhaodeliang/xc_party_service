@@ -1,0 +1,41 @@
+server:
+  port: 8081
+  undertow:
+    io-threads: 12
+    worker-threads: 60
+  servlet.context-path : /xc_party
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  config-location: classpath:mybatis-config.xml
+  type-aliases-package: com.daling.party.domain.entity
+logging:
+  level:
+    com.daling.account.coin.mapper: debug
+
+
+spring:
+  datasource:
+      url: jdbc:mysql://10.36.2.22:3306/xc_growth?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+      username: ymall_mobile
+      password: pwd:hfh36FVBv
+      driverClassName: com.mysql.jdbc.Driver
+      initialSize: 30
+      minIdle: 20
+      maxActive: 100
+      maxWait: 3000
+      minEvictableIdleTimeMillis: 30000
+      type: com.alibaba.druid.pool.DruidDataSource
+  rabbitmq:
+    host: l-cache1.qa.bj0.daling.com
+    port: 5672
+    username: daling
+    password: daling
+    publisher-confirms: true
+    virtual-host: /erp_betab
+
+xcucenter:
+  host: http://c.xc.beta.daling.com
+
+redis:
+  host: 10.36.4.66
+  port: 6380
